@@ -13,29 +13,16 @@ public class User {
         String expression = input.nextLine();
         input.close();
         this.expression = expression;
-        System.out.println(calculate());
     }
 
     private String calculate() {
+
         String[] expressionSymbols = parseExpression();
         if (expressionSymbols.length != 3) throw new IllegalNumberFormatException("Incorrect entered values");
-        int firstNumber;
-        int secondNumber;
-        char operator;
+
         if (expressionSymbols[0].chars().allMatch(Character::isDigit)
-                && expressionSymbols[2].chars().allMatch(Character::isDigit)) {
-            firstNumber = Integer.parseInt(expressionSymbols[0]);
-            secondNumber = Integer.parseInt(expressionSymbols[2]);
-            checkTheEnteredRange(firstNumber, secondNumber);
-            operator = expressionSymbols[1].charAt(0);
-            return String.valueOf(new Math(firstNumber, secondNumber, operator).calculate());
-        } else {
-            firstNumber = romanToArabic(expressionSymbols[0]);
-            secondNumber = romanToArabic(expressionSymbols[2]);
-            checkTheEnteredRange(firstNumber, secondNumber);
-            operator = expressionSymbols[1].charAt(0);
-            return arabicToRoman(new Math(firstNumber, secondNumber, operator).calculate());
-        }
+                && expressionSymbols[2].chars().allMatch(Character::isDigit)) return calculateArabic(expressionSymbols);
+        else return calculateRoman(expressionSymbols);
     }
 
     private String[] parseExpression() {
@@ -49,39 +36,60 @@ public class User {
         }
     }
 
-    private int romanToArabic(String expression) {
-        String romanNumeral = expression.toUpperCase();
-        int number = 0;
+    private String calculateArabic(String[] expressionSymbols){
+        int firstNumber = Integer.parseInt(expressionSymbols[0]);
+        int secondNumber = Integer.parseInt(expressionSymbols[2]);
+        checkTheEnteredRange(firstNumber, secondNumber);
+        char operator = expressionSymbols[1].charAt(0);
+        return String.valueOf(new Math(firstNumber, secondNumber, operator).calculate());
+    }
+
+    private String calculateRoman(String[] expressionSymbols){
+        int firstNumber = romanToArabic(expressionSymbols[0]);
+        int secondNumber = romanToArabic(expressionSymbols[2]);
+        checkTheEnteredRange(firstNumber, secondNumber);
+        char operator = expressionSymbols[1].charAt(0);
+        return arabicToRoman(new Math(firstNumber, secondNumber, operator).calculate());
+    }
+
+    private int romanToArabic(String romanNumber) {
+
+        String romanNumeral = romanNumber.toUpperCase();
+        int arabicNumber = 0;
         List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
         int i = 0;
 
         while ((romanNumeral.length() > 0) && (i < romanNumerals.size())) {
             RomanNumeral symbol = romanNumerals.get(i);
             if (romanNumeral.startsWith(symbol.name())) {
-                number += symbol.getValue();
+                arabicNumber += symbol.getValue();
                 romanNumeral = romanNumeral.substring(symbol.name().length());
             } else {
                 i++;
             }
         }
-        return number;
+        return arabicNumber;
     }
 
     private String arabicToRoman(int number) {
-        List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
 
+        List<RomanNumeral> romanNumerals = RomanNumeral.getReverseSortedValues();
         int i = 0;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder romanNumber = new StringBuilder();
 
         while ((number > 0) && (i < romanNumerals.size())) {
             RomanNumeral currentSymbol = romanNumerals.get(i);
             if (currentSymbol.getValue() <= number) {
-                sb.append(currentSymbol.name());
+                romanNumber.append(currentSymbol.name());
                 number -= currentSymbol.getValue();
             } else {
                 i++;
             }
         }
-        return sb.toString();
+        return romanNumber.toString();
+    }
+
+    public String getResult() {
+        return calculate();
     }
 }

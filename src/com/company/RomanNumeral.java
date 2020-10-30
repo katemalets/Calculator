@@ -25,7 +25,7 @@ public enum RomanNumeral {
 
     public static List<RomanNumeral> getReverseSortedValues() {
         return Arrays.stream(values())
-                .sorted(Comparator.comparing((RomanNumeral e) -> e.value).reversed())
+                .sorted(Comparator.comparing((RomanNumeral romanNumeral) -> romanNumeral.value).reversed())
                 .collect(Collectors.toList());
     }
 }
